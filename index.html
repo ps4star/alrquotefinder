@@ -1,0 +1,218 @@
+<!DOCTYPE HTML>
+<html lang="en">
+<body>
+	<div id="wait">
+		<h1 id="rand-quote">Now loadeen...</h1>
+		<h2>Fetching subtitles tarball. Might take a while, it's like 20 megabytes lol</h2>
+	</div>
+	<div id="normal">
+		<div id="res"></div>
+		<div id="search-container">
+			<input id="search-phrase-input" type="text" placeholder="Type phrase (enter or button to submit)">
+			<button id="submit">Search</button>
+		</div>
+	</div>
+
+	<style>
+
+* {
+	margin: 0;
+	padding: 0;
+	box-sizing: border-box;
+}
+
+#normal, #wait {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 100%;
+	height: 100%;
+
+	display: flex;
+	flex-flow: column nowrap;
+	justify-content: space-evenly;
+	align-items: center;
+
+	text-align: center;
+}
+
+#wait {
+	background: lightgray;
+	z-index: 2;
+}
+
+#wait > h1 {
+	font-size: 3.5rem;
+}
+
+#wait > h2 {
+	font-size: 1.25rem;
+}
+
+#search-phrase-input {
+	margin: 0 auto;
+	width: 90%;
+
+	font-size: 3rem;
+}
+
+#res {
+	width: 90%;
+	height: 60%;
+	background: lightgoldenrodyellow;
+
+	overflow-y: auto;
+}
+
+#search-container {
+	display:  flex;
+	flex-flow: row nowrap;
+
+	width: 99%;
+}
+
+#submit {
+	font-size:  3rem;
+}
+
+.search-result-item {
+	width: 100%;
+	height: 3rem;
+
+	cursor: pointer;
+
+	background: lightgray;
+
+	border-bottom: 1px solid black;
+
+	display: flex;
+	flex-flow: row nowrap;
+	justify-content: space-evenly;
+	align-items: center;
+}
+
+	</style>
+
+	<script defer>
+
+const $grab = (el) => document.getElementById(el)
+
+function pickRandom(arr) {
+	return arr[Math.floor(Math.random() * arr.length)]
+}
+
+const QUOTES = [
+	"Rolling dice like knives on a platter",
+	"Asking her how she's doeen",
+	"Abusing Becky",
+	"Hiding wifey",
+	"Having a picnic in the front yard",
+	"Rain and petals eavesdropping",
+	"Using the wrong word",
+	"Finding the right shoes",
+	"Sensing an understandment",
+	"Waiting until it's darktime",
+	"Jangling a loud thing",
+	"Jambling up words",
+	"Tearing people up",
+]
+
+function doQuoteChange() {
+	$grab('rand-quote').innerText = pickRandom(QUOTES) + "..."
+}
+
+doQuoteChange()
+setInterval(doQuoteChange, 1300)
+
+const $res = $grab('res')
+const INCLUDE_RANGE = 65
+function clearSearchResults() {
+	while ($res.firstChild) $res.removeChild($res.firstChild)
+}
+
+function addSearchResult(rawMeta, rawBody, searchTerm, idx) {
+	// const idx = rawBody.indexOf(searchTerm)
+
+	const el = document.createElement('div')
+	el.classList.add('search-result-item')
+
+		const textEl = document.createElement('p')
+		textEl.classList.add('search-result-text')
+		textEl.innerHTML = `"...${rawBody.slice(Math.max(0, idx - INCLUDE_RANGE), Math.min(rawBody.length - 1, idx + INCLUDE_RANGE))}..."`
+
+		el.appendChild(textEl)
+
+	el.onmousedown = () => {
+		const idxOfURL = rawMeta.search(/\[.{11}\]/)
+		window.open(`https://youtu.be/${rawMeta.slice(idxOfURL + 1, idxOfURL + 1 + 11)}`)
+	}
+
+	$res.appendChild(el)
+}
+
+function doSearch(input) {
+	clearSearchResults()
+
+	// First we go through each lineSegment BODY (not header) and see if the string is in there
+	for (let i = 0; i < lineSegments.length; i++) {
+		// [0] = meta
+		// [1] = body
+		let lsBody = lineSegments[i][1]
+		let idx = lsBody.indexOf(input)
+		if (idx == -1) {
+			continue
+		}
+
+		// Did find something
+		while (idx > -1) {
+			addSearchResult(lineSegments[i][0], lsBody, input, idx)
+
+			lsBody = lsBody.slice(idx + input.length)
+			idx = lsBody.indexOf(input)
+		}
+	}
+}
+
+function handleSubmit(e) {
+	if (e.key) {
+		if (e.key === 'Enter') {
+			doSearch($grab('search-phrase-input').value)
+		}
+		return
+	}
+
+	// Is click
+	doSearch($grab('search-phrase-input').value)
+}
+
+// Fetch the alrsubs tar
+let lines, lineSegments = []
+fetch("./alrsubs.tar")
+	.then(res => res.text())
+	.then(thisTextIsSoRawYouGuise => {
+		// This is here for debug purposes
+		// Should be set to 0 in production
+		setTimeout(() => {
+			// Magically divides into each video lol
+			lines = thisTextIsSoRawYouGuise.replace(/\u0000/g, "").toLowerCase().split("\n").filter(el => el)
+
+			// Hacky first index fix
+			lines[0] = "newsubs/" + lines[0].split("newsubs/")[2]
+
+			lines.forEach(l => {
+				lineSegments.push([l.split("ps4starps4star")[0], l.split("ps4starps4star")[1]])
+			})
+
+			// Hide the wait screen
+			$grab('wait').style.display = 'none'
+
+			// Event handler for input (enter = submit)
+			// #submit #search-phrase-input
+			$grab('submit').onclick = handleSubmit
+			$grab('search-phrase-input').onkeydown = handleSubmit
+		}, 0)
+	})
+
+	</script>
+</body>
+</html>
