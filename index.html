@@ -174,7 +174,9 @@ function doSearch(input) {
 
 function handleSubmit(e) {
 	let val = $grab('search-phrase-input').value.toLowerCase()
-	if (val.length <= 2) return
+	if (val.length <= 2) {
+		return
+	}
 
 	if (e.key) {
 		if (e.key === 'Enter') {
