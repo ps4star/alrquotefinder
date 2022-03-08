@@ -157,7 +157,7 @@ function doSearch(input) {
 	for (let i = 0; i < lineSegments.length; i++) {
 		// [0] = meta
 		// [1] = body
-		let lsBody = lineSegments[i][1].replace(/ +/g, " ")
+		let lsBody = lineSegments[i][1]
 		let idx = lsBody.indexOf(input)
 		if (idx == -1) {
 			continue
@@ -167,8 +167,7 @@ function doSearch(input) {
 		while (idx > -1) {
 			addSearchResult(lineSegments[i][0], lsBody, input, idx)
 
-			lsBody = lsBody.slice(idx + input.length)
-			idx = lsBody.indexOf(input)
+			idx = lsBody.indexOf(input, idx + input.length)
 		}
 	}
 }
@@ -196,13 +195,14 @@ fetch("./alrsubs.tar")
 		// Should be set to 0 in production
 		setTimeout(() => {
 			// Magically divides into each video lol
-			lines = thisTextIsSoRawYouGuise.replace(/\u0000/g, "").split("\n").filter(el => el)
+			lines = thisTextIsSoRawYouGuise.replace(/\u0000/g, "").replace(/ +/g, " ").split("\n").filter(el => el)
 
 			// Hacky first index fix
 			lines[0] = "newsubs/" + lines[0].split("newsubs/")[2]
 
 			lines.forEach(l => {
-				lineSegments.push([l.split("ps4starps4star")[0], l.split("ps4starps4star")[1].toLowerCase()])
+				const splitText = l.split("ps4starps4star")
+				lineSegments.push([splitText[0], splitText[1].toLowerCase()])
 			})
 
 			// Hide the wait screen
@@ -214,7 +214,7 @@ fetch("./alrsubs.tar")
 			$grab('search-phrase-input').onkeydown = handleSubmit
 
 			$grab('search-phrase-input').focus()
-		}, 2000)
+		}, 0)
 	})
 
 	</script>
