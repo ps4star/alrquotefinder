@@ -157,7 +157,7 @@ function doSearch(input) {
 	for (let i = 0; i < lineSegments.length; i++) {
 		// [0] = meta
 		// [1] = body
-		let lsBody = lineSegments[i][1].toLowerCase().replace(/ +/g, " ")
+		let lsBody = lineSegments[i][1].replace(/ +/g, " ")
 		let idx = lsBody.indexOf(input)
 		if (idx == -1) {
 			continue
@@ -202,7 +202,7 @@ fetch("./alrsubs.tar")
 			lines[0] = "newsubs/" + lines[0].split("newsubs/")[2]
 
 			lines.forEach(l => {
-				lineSegments.push([l.split("ps4starps4star")[0], l.split("ps4starps4star")[1]])
+				lineSegments.push([l.split("ps4starps4star")[0], l.split("ps4starps4star")[1].toLowerCase()])
 			})
 
 			// Hide the wait screen
