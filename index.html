@@ -174,15 +174,17 @@ function doSearch(input) {
 }
 
 function handleSubmit(e) {
+	let val = $grab('search-phrase-input').value.toLowerCase()
+
 	if (e.key) {
 		if (e.key === 'Enter') {
-			doSearch($grab('search-phrase-input').value)
+			doSearch(val)
 		}
 		return
 	}
 
 	// Is click
-	doSearch($grab('search-phrase-input').value)
+	doSearch(val)
 }
 
 // Fetch the alrsubs tar
