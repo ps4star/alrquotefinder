@@ -212,6 +212,8 @@ fetch("./alrsubs.tar")
 			// #submit #search-phrase-input
 			$grab('submit').onclick = handleSubmit
 			$grab('search-phrase-input').onkeydown = handleSubmit
+
+			$grab('search-phrase-input').focus()
 		}, 2000)
 	})
 
