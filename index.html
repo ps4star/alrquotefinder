@@ -76,6 +76,8 @@
 }
 
 .search-result-item {
+	position: relative;
+
 	width: 100%;
 	height: 3rem;
 
@@ -89,6 +91,11 @@
 	flex-flow: row nowrap;
 	justify-content: space-evenly;
 	align-items: center;
+}
+
+.search-result-perc {
+	margin-left: auto;
+	font-size: 0.90rem;
 }
 
 	</style>
@@ -115,7 +122,7 @@ const QUOTES = [
 	"Jangling a loud thing",
 	"Jambling up words",
 	"Tearing people up",
-	"Throwing away individually-wrapped chease because 1 was missing",
+	"Throwing away individually-wrapped chease",
 	"Unplugging the freezer",
 	"Blaming Twinkie's weight on Eric & Rickie"
 ]
@@ -145,6 +152,13 @@ function addSearchResult(rawMeta, rawBody, searchTerm, idx) {
 
 		el.appendChild(textEl)
 
+		const textPercEl = document.createElement('p')
+		textPercEl.classList.add('search-result-text')
+		textPercEl.classList.add('search-result-perc')
+		textPercEl.innerHTML = `~${((idx / rawBody.length) * 100).toString().split('.')[0]}% thru video`
+
+		el.appendChild(textPercEl)
+
 	el.onmousedown = () => {
 		const idxOfURL = rawMeta.search(/\[.{11}\]/)
 		window.open(`https://youtu.be/${rawMeta.slice(idxOfURL + 1, idxOfURL + 1 + 11)}`)
@@ -155,6 +169,7 @@ function addSearchResult(rawMeta, rawBody, searchTerm, idx) {
 
 function doSearch(input) {
 	clearSearchResults()
+	$res.hidden = true
 
 	// First we go through each lineSegment BODY (not header) and see if the string is in there
 	for (let i = 0; i < lineSegments.length; i++) {
@@ -173,6 +188,8 @@ function doSearch(input) {
 			idx = lsBody.indexOf(input, idx + input.length)
 		}
 	}
+
+	$res.hidden = false
 }
 
 function handleSubmit(e) {
