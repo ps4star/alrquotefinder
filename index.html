@@ -1,4 +1,7 @@
 <!DOCTYPE HTML>
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <html lang="en">
 <body>
 	<div id="wait">
@@ -6,6 +9,9 @@
 		<h2>Fetching subtitles tarball. Might take a while, it's like 20 megabytes lol</h2>
 	</div>
 	<div id="normal">
+		<div id="resheader-container">
+			<pre id="resheader"> </pre>
+		</div>
 		<div id="res"></div>
 		<div id="search-container">
 			<input tabindex="-1" id="search-phrase-input" type="text" placeholder="Type ALR quote (enter to submit)">
@@ -19,6 +25,14 @@
 	margin: 0;
 	padding: 0;
 	box-sizing: border-box;
+}
+
+#resheader-container {
+	display: flex;
+}
+
+#resheader {
+	font-size: 1.25rem;
 }
 
 #normal, #wait {
@@ -135,6 +149,7 @@ doQuoteChange()
 setInterval(doQuoteChange, 1300)
 
 const $res = $grab('res')
+const $resheader = $grab('resheader')
 const INCLUDE_RANGE = 75
 function clearSearchResults() {
 	while ($res.firstChild) $res.removeChild($res.firstChild)
@@ -188,6 +203,8 @@ function doSearch(input) {
 			idx = lsBody.indexOf(input, idx + input.length)
 		}
 	}
+
+	$resheader.innerText = `"${input}": ${$res.children.length.toLocaleString()} results`
 
 	$res.hidden = false
 }
